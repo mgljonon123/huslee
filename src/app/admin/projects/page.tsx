@@ -50,13 +50,43 @@ export default function ProjectsPage() {
   const [formData, setFormData] = useState<ProjectFormData>(initialFormData);
 
   // Function to get token from cookie
-  const getToken = () => Cookies.get('token');
+  const getToken = () => {
+    // Try to get token from js-cookie first
+    const tokenFromJsCookie = Cookies.get('token');
+    if (tokenFromJsCookie) return tokenFromJsCookie;
+    
+    // Try to get token from localStorage
+    if (typeof window !== 'undefined') {
+      const tokenFromLocalStorage = localStorage.getItem('token');
+      if (tokenFromLocalStorage) return tokenFromLocalStorage;
+    }
+    
+    // Fallback to document.cookie if js-cookie doesn't find it
+    const tokenFromDocCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+      
+    return tokenFromDocCookie || null;
+  };
 
   const fetchProjects = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/projects');
+      const token = getToken();
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/projects', {
+        headers
+      });
+      
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
@@ -194,14 +224,21 @@ export default function ProjectsPage() {
               className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
             >
               <div className="relative h-48">
-                <Image
-                  src={project.image || '/project-placeholder.png'}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  onError={(e) => { e.currentTarget.src = '/project-placeholder.png'; }}
-                />
+                {project.image ? (
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { 
+                      console.error('Image loading error:', e);
+                      e.currentTarget.src = '/project-placeholder.svg'; 
+                    }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">No image</span>
+                  </div>
+                )}
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { authMiddleware, adminMiddleware } from '@/lib/auth';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -34,6 +35,7 @@ export async function GET(
     );
   }
 }
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -73,6 +75,7 @@ export async function PUT(
     );
   }
 }
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -95,6 +98,8 @@ export async function DELETE(
         { status: 404 }
       );
     }
+    
+    // Delete the contact message
     await prisma.contact.delete({
       where: { id },
     });
@@ -107,6 +112,36 @@ export async function DELETE(
     console.error('Error deleting contact message:', error);
     return NextResponse.json(
       { error: 'Failed to delete contact message' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const authResponse = await authMiddleware(request);
+    if (authResponse.status !== 200) return authResponse;
+    
+    const adminResponse = await adminMiddleware(request);
+    if (adminResponse.status !== 200) return adminResponse;
+
+    const { id } = params;
+    const body = await request.json();
+    const { read } = body;
+
+    const contact = await prisma.contact.update({
+      where: { id },
+      data: { read },
+    });
+
+    return NextResponse.json(contact);
+  } catch (error) {
+    console.error('Error updating contact:', error);
+    return NextResponse.json(
+      { error: 'Failed to update contact' },
       { status: 500 }
     );
   }

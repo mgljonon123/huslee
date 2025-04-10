@@ -17,7 +17,12 @@ export default function LoginPage() {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value};${expires};path=/`;
+    
+    // Check if we're in a secure context (HTTPS)
+    const isSecure = window.location.protocol === 'https:';
+    
+    // Set cookie with appropriate flags
+    document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,20 +43,16 @@ export default function LoginPage() {
 
       if (response.ok) {
         console.log('Login successful, token:', data.token);
+        
+        // Store token in cookie
         setCookie('token', data.token, 7);
-        setTimeout(() => {
-          const savedToken = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('token='))
-            ?.split('=')[1];
-          console.log('Cookie value after set:', savedToken);
-          if (savedToken) {
-             router.push('/admin/dashboard');
-          } else {
-            setError('Cookie хадгалахад алдаа гарлаа.');
-            setIsLoading(false);
-          }
-        }, 100);
+        
+        // Also store in localStorage as backup
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', data.token);
+        }
+        
+        router.push('/admin/dashboard');
       } else {
         setError(data.error || 'И-мэйл эсвэл нууц үг буруу байна');
         setIsLoading(false);
@@ -140,4 +141,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { authMiddleware, adminMiddleware } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Allow public access to skills data
     const skills = await prisma.skill.findMany({
       orderBy: { order: 'asc' },
     });
@@ -17,6 +18,7 @@ export async function GET() {
     );
   }
 }
+
 export async function POST(request: NextRequest) {
   try {
     const authResponse = await authMiddleware(request);

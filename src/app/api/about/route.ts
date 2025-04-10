@@ -3,13 +3,22 @@ import prisma from '@/lib/prisma';
 import { authMiddleware, adminMiddleware } from '@/lib/auth';
 export async function GET() {
   try {
-    const about = await prisma.about.findFirst();
+    let about = await prisma.about.findFirst();
     
     if (!about) {
-      return NextResponse.json(
-        { error: 'About information not found' },
-        { status: 404 }
-      );
+      // Create a default About record if none exists
+      about = await prisma.about.create({
+        data: {
+          bio: 'Welcome to my portfolio! I am a passionate developer with expertise in web technologies.',
+          profileImage: '/profile-placeholder.svg',
+          email: 'your.email@example.com',
+          location: 'Your Location',
+          resumeUrl: '',
+          socialLinks: {},
+        },
+      });
+      
+      console.log('Created default About record:', about);
     }
     
     return NextResponse.json(about);

@@ -20,8 +20,15 @@ export default function AdminLayout({
   const isAuthPage = pathname === '/admin/login' || pathname === '/admin/register';
 
   const handleLogout = () => {
+    // Clear cookie
     document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-    window.location.href = '/admin/register';
+    
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+    
+    window.location.href = '/admin/login';
   };
 
   return (

@@ -1,7 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+
+interface AboutData {
+  email: string;
+  location: string | null;
+  socialLinks: {
+    [key: string]: string;
+  } | null;
+}
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -11,6 +19,27 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [contactInfo, setContactInfo] = useState<AboutData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const response = await fetch('/api/about');
+        if (!response.ok) {
+          throw new Error('Failed to fetch contact information');
+        }
+        const data = await response.json();
+        setContactInfo(data);
+      } catch (error) {
+        console.error('Error fetching contact info:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContactInfo();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,8 +47,19 @@ export default function Contact() {
     setSubmitStatus('idle');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Mock Form submitted:', formData);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send message');
+      }
+
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
@@ -38,26 +78,31 @@ export default function Contact() {
     }));
   };
 
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: 'Email',
-      content: 'munkhtulga0118@email.com',
-      link: 'mailto:munkhtulga0118@email.com'
-    },
-    {
-      icon: Phone,
-      title: 'Phone',
-      content: '+976 89980862',
-      link: 'tel:+97689980862'
-    },
-    {
-      icon: MapPin,
-      title: 'Location',
-      content: 'Ulaanbaatar, Mongolia',
-      link: '#'
+  const getContactItems = () => {
+    if (!contactInfo) return [];
+
+    const items = [];
+
+    if (contactInfo.email) {
+      items.push({
+        icon: Mail,
+        title: 'Email',
+        content: contactInfo.email,
+        link: `mailto:${contactInfo.email}`
+      });
     }
-  ];
+
+    if (contactInfo.location) {
+      items.push({
+        icon: MapPin,
+        title: 'Location',
+        content: contactInfo.location,
+        link: '#'
+      });
+    }
+
+    return items;
+  };
 
   return (
     <>
@@ -75,25 +120,51 @@ export default function Contact() {
            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
              Contact Details
            </h3>
-           {contactInfo.map((item) => (
-             <a
-               key={item.title}
-               href={item.link}
-               target={item.link !== '#' ? "_blank" : undefined}
-               rel="noopener noreferrer"
-               className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors duration-200 group"
-             >
-               <div className="flex-shrink-0 mt-1 p-2.5 bg-primary/10 dark:bg-primary/20 rounded-full text-primary">
-                 <item.icon className="w-5 h-5" />
+           {isLoading ? (
+             <div className="flex justify-center items-center h-32">
+               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+             </div>
+           ) : (
+             getContactItems().map((item) => (
+               <a
+                 key={item.title}
+                 href={item.link}
+                 target={item.link !== '#' ? "_blank" : undefined}
+                 rel="noopener noreferrer"
+                 className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors duration-200 group"
+               >
+                 <div className="flex-shrink-0 mt-1 p-2.5 bg-primary/10 dark:bg-primary/20 rounded-full text-primary">
+                   <item.icon className="w-5 h-5" />
+                 </div>
+                 <div>
+                   <p className="font-semibold text-gray-800 dark:text-gray-100">{item.title}</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary dark:group-hover:text-primary-light break-words">
+                     {item.content}
+                   </p>
+                 </div>
+               </a>
+             ))
+           )}
+           {contactInfo?.socialLinks && (
+             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                 Social Links
+               </h4>
+               <div className="flex gap-4">
+                 {Object.entries(contactInfo.socialLinks).map(([platform, url]) => (
+                   <a
+                     key={platform}
+                     href={url}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
+                   >
+                     {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                   </a>
+                 ))}
                </div>
-               <div>
-                 <p className="font-semibold text-gray-800 dark:text-gray-100">{item.title}</p>
-                 <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary dark:group-hover:text-primary-light break-words">
-                   {item.content}
-                 </p>
-               </div>
-             </a>
-           ))}
+             </div>
+           )}
         </div>
 
         <div>

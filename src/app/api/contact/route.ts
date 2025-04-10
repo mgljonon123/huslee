@@ -1,34 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { authMiddleware, adminMiddleware } from '@/lib/auth';
-export async function POST(request: NextRequest) {
+
+export async function POST(request: Request) {
   try {
-    const data = await request.json();
-    if (!data.name || !data.email || !data.message) {
+    console.log('Received contact form submission');
+    const body = await request.json();
+    console.log('Form data:', body);
+    const { name, email, message } = body;
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      console.log('Missing required fields');
       return NextResponse.json(
-        { error: 'Name, email, and message are required' },
+        { error: 'Missing required fields' },
         { status: 400 }
       );
     }
+
+    // Save contact message to database
+    console.log('Saving to database...');
     const contact = await prisma.contact.create({
       data: {
-        name: data.name,
-        email: data.email,
-        message: data.message,
+        name,
+        email,
+        message,
       },
     });
-    
-    return NextResponse.json(contact, { status: 201 });
-  } catch (error) {
-    console.error('Error creating contact message:', error);
+    console.log('Saved contact:', contact);
+
     return NextResponse.json(
-      { error: 'Failed to submit contact message' },
+      { message: 'Contact message sent successfully', contact },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error saving contact message:', error);
+    return NextResponse.json(
+      { error: 'Failed to send message' },
       { status: 500 }
     );
   }
 }
+
 export async function GET(request: NextRequest) {
   try {
+    console.log('Fetching contact messages');
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
     
@@ -38,6 +54,7 @@ export async function GET(request: NextRequest) {
     const contacts = await prisma.contact.findMany({
       orderBy: { createdAt: 'desc' },
     });
+    console.log('Found contacts:', contacts);
     
     return NextResponse.json(contacts);
   } catch (error) {

@@ -10,7 +10,7 @@ export default function Home() {
       <section id="hero" className="flex flex-col items-center justify-center text-center py-24 md:py-23 bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="mb-4 text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Hi, I'm Munkhtulga
+            Hi, I'm Chin Khuslen
           </h1>
           <h2 className="mb-8 text-2xl md:text-4xl font-semibold text-primary dark:text-primary-dark">
             Full Stack Developer

@@ -65,13 +65,20 @@ export default function ProjectList({ projects }: ProjectListProps) {
             className="group flex flex-col bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
             <div className="relative h-52 w-full overflow-hidden">
-              <Image
-                src={project.image || '/project-placeholder.png'} // Fallback image
-                alt={project.title}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+              {project.image ? (
+                <img
+                  src={project.image || '/project-placeholder.svg'}
+                  alt={project.title}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    e.currentTarget.src = '/project-placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                  <span className="text-gray-500 dark:text-gray-400">No image</span>
+                </div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             

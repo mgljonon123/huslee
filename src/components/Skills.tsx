@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Code2, 
   Database, 
@@ -10,36 +10,88 @@ import {
 } from 'lucide-react';
 
 interface Skill {
+  id: string;
   name: string;
-  icon: React.ReactNode;
+  icon: string;
   level: number;
-  category: 'frontend' | 'backend' | 'database' | 'devops' | 'other';
+  category: string;
+  order: number;
 }
 
-const skills: Skill[] = [
-  { name: 'React', icon: <Code2 className="w-5 h-5 text-blue-500" />, level: 5, category: 'frontend' },
-  { name: 'Next.js', icon: <Globe className="w-5 h-5 text-green-500" />, level: 4, category: 'frontend' },
-  { name: 'Node.js', icon: <Server className="w-5 h-5 text-purple-500" />, level: 4, category: 'backend' },
-  { name: 'TypeScript', icon: <Code2 className="w-5 h-5 text-sky-500" />, level: 4, category: 'frontend' },
-  { name: 'MongoDB', icon: <Database className="w-5 h-5 text-emerald-500" />, level: 3, category: 'database' },
-  { name: 'Tailwind CSS', icon: <Layout className="w-5 h-5 text-teal-500" />, level: 5, category: 'frontend' },
-];
+const iconComponents = {
+  code: Code2,
+  database: Database,
+  layout: Layout,
+  server: Server,
+  globe: Globe,
+};
+
 const groupSkillsByCategory = (skills: Skill[]) => {
   return skills.reduce((acc, skill) => {
-    const category = skill.category;
+    const category = skill.category.toLowerCase();
     if (!acc[category]) {
       acc[category] = [];
     }
     acc[category].push(skill);
     return acc;
-  }, {} as { [key in Skill['category']]: Skill[] });
+  }, {} as { [key: string]: Skill[] });
 };
 
 export default function Skills() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch('/api/skills');
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch skills');
+        }
+        
+        const data = await response.json();
+        // Sort skills by order
+        const sortedSkills = data.sort((a: Skill, b: Skill) => a.order - b.order);
+        setSkills(sortedSkills);
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+        setError('Failed to load skills. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-600 dark:text-red-400 py-8">
+        {error}
+      </div>
+    );
+  }
+
   const groupedSkills = groupSkillsByCategory(skills);
-  const categories = Object.keys(groupedSkills) as Skill['category'][];
+  const categories = Object.keys(groupedSkills).sort();
   const levelToPercentage = (level: number) => {
     return Math.min(Math.max(level, 0), 5) * 20;
+  };
+
+  const getIconComponent = (iconName: string) => {
+    const IconComponent = iconComponents[iconName.toLowerCase() as keyof typeof iconComponents] || Code2;
+    return <IconComponent className="w-5 h-5 text-primary" />;
   };
 
   return (
@@ -61,10 +113,10 @@ export default function Skills() {
             </h3>
             <div className="space-y-5">
               {groupedSkills[category].map((skill) => (
-                <div key={skill.name}>
+                <div key={skill.id}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      {skill.icon} 
+                      {getIconComponent(skill.icon)}
                       <span className="text-md font-medium text-gray-700 dark:text-gray-300">
                         {skill.name}
                       </span>

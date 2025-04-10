@@ -11,9 +11,10 @@
     "create-admin": "ts-node --compiler-options {\"module\":\"CommonJS\"} scripts/create-admin.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.6.0",
     "bcryptjs": "^3.0.2",
     "crypto": "^1.0.1",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.6.3",
     "jose": "^6.0.10",
     "js-cookie": "^3.0.5",
@@ -21,7 +22,6 @@
     "lucide-react": "^0.487.0",
     "mongoose": "^8.13.2",
     "next": "15.2.4",
-    "prisma": "^6.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -35,6 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "prisma": "^6.6.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
