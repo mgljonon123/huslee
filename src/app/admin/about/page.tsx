@@ -19,12 +19,14 @@ export default function AboutPage() {
     bio: '',
     profileImage: '/profile-placeholder.svg',
     email: '',
+    socialLinks: {},
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<AboutData>({
     bio: '',
     profileImage: '/profile-placeholder.svg',
     email: '',
+    socialLinks: {},
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,8 +79,8 @@ export default function AboutPage() {
       }
       
       setError(null);
-    } catch (err) {
-      console.error('Error fetching about data:', err);
+    } catch {
+      console.error('Error fetching about data');
       setError('Failed to load about data. Please try again later.');
       
       // Set default values in case of error
@@ -136,8 +138,8 @@ export default function AboutPage() {
       const data = await response.json();
       setAboutData(data);
       setIsEditing(false);
-    } catch (err) {
-      console.error('Error updating about data:', err);
+    } catch {
+      console.error('Error updating about data');
       alert('Failed to update about data. Please try again later.');
     }
   };
