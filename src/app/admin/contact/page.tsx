@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 interface Contact {
   id: string;
@@ -119,88 +120,96 @@ export default function ContactPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">Error!</strong>
-        <span className="block sm:inline"> {error}</span>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+      <motion.div 
+        className="mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-3xl font-light tracking-widest mb-8 uppercase">
           Contact Messages
         </h1>
-        <button
-          onClick={fetchContacts}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Refresh
-        </button>
-      </div>
+        <p className="text-sm tracking-wider text-gray-400 max-w-lg mb-12">
+          MANAGE YOUR INCOMING MESSAGES AND COMMUNICATIONS
+        </p>
+      </motion.div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          {contacts.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-300 text-center py-4">
-              No contact messages yet.
-            </p>
+      <div className="bg-black border border-gray-800 rounded-lg overflow-hidden">
+        <div className="p-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-t border-white animate-spin rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="border border-gray-800 px-6 py-4 text-white" role="alert">
+              <span className="tracking-wider text-xs">ERROR</span>
+              <span className="block mt-2 text-gray-400"> {error}</span>
+            </div>
           ) : (
-            <div className="space-y-4">
-              {contacts.map((contact) => (
-                <div
-                  key={contact.id}
-                  className={`border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                    !contact.read ? 'border-l-4 border-l-blue-500' : ''
-                  }`}
+            <div className="space-y-8">
+              <div className="flex justify-end">
+                <button
+                  onClick={fetchContacts}
+                  className="px-6 py-2 border border-white/30 hover:bg-white/5 text-white text-xs tracking-widest transition-all duration-300"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                        {contact.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {contact.email}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {new Date(contact.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => toggleReadStatus(contact.id, contact.read)}
-                        className={`px-2 py-1 text-xs rounded ${
-                          contact.read 
-                            ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' 
-                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                        }`}
-                      >
-                        {contact.read ? 'Mark as Unread' : 'Mark as Read'}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(contact.id)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {contact.message}
-                  </p>
+                  REFRESH MESSAGES
+                </button>
+              </div>
+
+              {contacts.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 tracking-wider">NO MESSAGES FOUND</p>
+                  <p className="text-sm text-gray-500 mt-2 tracking-wider">NO CONTACT MESSAGES HAVE BEEN RECEIVED YET</p>
                 </div>
-              ))}
+              ) : (
+                <div className="space-y-4">
+                  {contacts.map((contact) => (
+                    <div
+                      key={contact.id}
+                      className={`border border-gray-800 rounded-lg p-6 hover:bg-gray-900 transition-colors ${
+                        !contact.read ? 'border-l-4 border-l-white' : ''
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg tracking-wider uppercase font-light text-white">
+                            {contact.name}
+                          </h3>
+                          <p className="text-sm text-gray-400 tracking-wider mt-1">
+                            {contact.email}
+                          </p>
+                          <p className="text-xs text-gray-500 tracking-wider mt-2">
+                            {new Date(contact.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleReadStatus(contact.id, contact.read)}
+                            className={`px-4 py-2 text-xs tracking-widest rounded-lg transition-colors ${
+                              contact.read 
+                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white' 
+                                : 'bg-white text-black hover:bg-white/90'
+                            }`}
+                          >
+                            {contact.read ? 'MARK AS UNREAD' : 'MARK AS READ'}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(contact.id)}
+                            className="px-4 py-2 text-xs tracking-widest text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            DELETE
+                          </button>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-gray-400 tracking-wider whitespace-pre-wrap">
+                        {contact.message}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

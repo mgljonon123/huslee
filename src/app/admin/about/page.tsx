@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 interface AboutData {
   id?: string;
@@ -141,227 +142,238 @@ export default function AboutPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">Error!</strong>
-        <span className="block sm:inline"> {error}</span>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-          About Me Management
+      <motion.div 
+        className="mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-3xl font-light tracking-widest mb-8 uppercase">
+          About Me
         </h1>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {isEditing ? 'Cancel Editing' : 'Edit About Me'}
-        </button>
-      </div>
+        <p className="text-sm tracking-wider text-gray-400 max-w-lg mb-12">
+          MANAGE YOUR PERSONAL INFORMATION AND PROFILE
+        </p>
+      </motion.div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Profile Image
-                </label>
-                <div className="flex items-center space-x-4">
-                  <div className="relative h-32 w-32">
-                    <img
-                      src={imagePreview || formData.profileImage}
-                      alt="Profile"
-                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                      onError={(e) => { 
-                        console.error('Image loading error:', e);
-                        e.currentTarget.src = '/profile-placeholder.svg'; 
-                      }}
+      <div className="bg-black border border-gray-800 rounded-lg overflow-hidden">
+        <div className="p-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-t border-white animate-spin rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="border border-gray-800 px-6 py-4 text-white" role="alert">
+              <span className="tracking-wider text-xs">ERROR</span>
+              <span className="block mt-2 text-gray-400"> {error}</span>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {isEditing ? (
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Profile Image
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <div className="relative h-32 w-32">
+                        <Image
+                          src={imagePreview || formData.profileImage}
+                          alt="Profile"
+                          width={128}
+                          height={128}
+                          className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                        />
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="block w-full text-sm text-gray-400
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-gray-800 file:text-white
+                          hover:file:bg-gray-700"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Bio
+                    </label>
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      rows={4}
+                      className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
+                      required
                     />
                   </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="block w-full text-sm text-gray-500 dark:text-gray-400
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-blue-50 file:text-blue-700
-                      dark:file:bg-blue-900 dark:file:text-blue-200
-                      hover:file:bg-blue-100 dark:hover:file:bg-blue-800"
-                  />
-                </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Bio
-                </label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  rows={4}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  required
-                />
-              </div>
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
+                      required
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  required
-                />
-              </div>
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Location (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location || ''}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Location (optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.location || ''}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Resume URL (optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.resumeUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
+                      className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Resume URL (optional)
-                </label>
-                <input
-                  type="url"
-                  value={formData.resumeUrl || ''}
-                  onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
+                  <div>
+                    <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
+                      Social Links (JSON format)
+                    </label>
+                    <textarea
+                      value={formData.socialLinks ? JSON.stringify(formData.socialLinks, null, 2) : ''}
+                      onChange={(e) => {
+                        try {
+                          const socialLinks = e.target.value ? JSON.parse(e.target.value) : null;
+                          setFormData({ ...formData, socialLinks });
+                        } catch (err) {
+                          // Invalid JSON, but we'll let the user continue typing
+                        }
+                      }}
+                      rows={4}
+                      className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
+                      placeholder='{"github": "https://github.com/username", "linkedin": "https://linkedin.com/in/username"}'
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Social Links (JSON format)
-                </label>
-                <textarea
-                  value={formData.socialLinks ? JSON.stringify(formData.socialLinks, null, 2) : ''}
-                  onChange={(e) => {
-                    try {
-                      const socialLinks = e.target.value ? JSON.parse(e.target.value) : null;
-                      setFormData({ ...formData, socialLinks });
-                    } catch (err) {
-                      // Invalid JSON, but we'll let the user continue typing
-                    }
-                  }}
-                  rows={4}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder='{"github": "https://github.com/username", "linkedin": "https://linkedin.com/in/username"}'
-                />
-              </div>
+                  <div className="flex justify-end gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="px-4 py-2 text-gray-400 hover:text-white text-xs tracking-widest"
+                    >
+                      CANCEL
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 border border-white text-white hover:bg-white/10 text-xs tracking-widest transition-colors"
+                    >
+                      SAVE CHANGES
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-8">
+                  <div className="flex items-center space-x-6">
+                    <div className="relative h-32 w-32">
+                      <Image
+                        src={aboutData.profileImage}
+                        alt="Profile"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="text-xl tracking-wider uppercase font-light text-white">
+                        Profile Information
+                      </h2>
+                      <p className="text-gray-400 mt-2 text-sm tracking-wider">
+                        Click "Edit About Me" to update your profile information.
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <div className="relative h-32 w-32">
-                  <Image
-                    src={aboutData.profileImage}
-                    alt="Profile"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Profile Information
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300 mt-2">
-                    Click "Edit About Me" to update your profile information.
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Bio
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {aboutData.bio}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Contact Information
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">Email:</span> {aboutData.email}
-                  </p>
-                  {aboutData.location && (
-                    <p className="text-gray-600 dark:text-gray-300">
-                      <span className="font-medium">Location:</span> {aboutData.location}
+                  <div>
+                    <h3 className="text-lg tracking-wider uppercase font-light text-white mb-4">
+                      Bio
+                    </h3>
+                    <p className="text-gray-400 tracking-wider">
+                      {aboutData.bio}
                     </p>
-                  )}
-                  {aboutData.resumeUrl && (
-                    <p className="text-gray-600 dark:text-gray-300">
-                      <span className="font-medium">Resume:</span>{' '}
-                      <a 
-                        href={aboutData.resumeUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                      >
-                        View Resume
-                      </a>
-                    </p>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              {aboutData.socialLinks && (
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    Social Links
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(aboutData.socialLinks).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800"
-                      >
-                        {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      </a>
-                    ))}
+                  <div>
+                    <h3 className="text-lg tracking-wider uppercase font-light text-white mb-4">
+                      Contact Information
+                    </h3>
+                    <div className="space-y-2">
+                      <p className="text-gray-400 tracking-wider">
+                        <span className="text-white">Email:</span> {aboutData.email}
+                      </p>
+                      {aboutData.location && (
+                        <p className="text-gray-400 tracking-wider">
+                          <span className="text-white">Location:</span> {aboutData.location}
+                        </p>
+                      )}
+                      {aboutData.resumeUrl && (
+                        <p className="text-gray-400 tracking-wider">
+                          <span className="text-white">Resume:</span>{' '}
+                          <a 
+                            href={aboutData.resumeUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            View Resume
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {aboutData.socialLinks && (
+                    <div>
+                      <h3 className="text-lg tracking-wider uppercase font-light text-white mb-4">
+                        Social Links
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(aboutData.socialLinks).map(([platform, url]) => (
+                          <a
+                            key={platform}
+                            href={url as string}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 text-sm bg-gray-800 text-gray-400 rounded-full hover:bg-gray-700 hover:text-white transition-colors"
+                          >
+                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-6 py-2 border border-white/30 hover:bg-white/5 text-white text-xs tracking-widest transition-all duration-300"
+                    >
+                      EDIT ABOUT ME
+                    </button>
                   </div>
                 </div>
               )}

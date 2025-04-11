@@ -82,11 +82,4 @@ export default function Navigation() {
       </div>
     </nav>
   );
-}
-const styles = `
-  .nav-link {
-    @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 
-    hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 
-    transition-colors duration-200;
-  }
-`; 
+} 

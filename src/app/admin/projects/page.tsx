@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
+import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -201,184 +203,232 @@ export default function ProjectsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-          Projects Management
+      <motion.div 
+        className="mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-3xl font-light tracking-widest mb-8 uppercase">
+          Projects
         </h1>
-        <button
-          onClick={handleAddProject}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Add New Project
-        </button>
-      </div>
+        <p className="text-sm tracking-wider text-gray-400 max-w-lg mb-12">
+          MANAGE YOUR PORTFOLIO PROJECTS AND SHOWCASE YOUR WORK
+        </p>
+      </motion.div>
 
-      {isLoading && <p>Loading projects...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
-
-      {!isLoading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-            >
-              <div className="relative h-48">
-                {project.image ? (
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => { 
-                      console.error('Image loading error:', e);
-                      e.currentTarget.src = '/project-placeholder.svg'; 
-                    }}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                    <span className="text-gray-500 dark:text-gray-400">No image</span>
-                  </div>
-                )}
+      <div className="bg-black border border-gray-800 rounded-lg overflow-hidden">
+        <div className="p-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-t border-white animate-spin rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="border border-gray-800 px-6 py-4 text-white" role="alert">
+              <span className="tracking-wider text-xs">ERROR</span>
+              <span className="block mt-2 text-gray-400"> {error}</span>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              <div className="flex justify-end">
+                <button
+                  onClick={handleAddProject}
+                  className="px-6 py-2 border border-white/30 hover:bg-white/5 text-white text-xs tracking-widest transition-all duration-300"
+                >
+                  ADD NEW PROJECT
+                </button>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {project.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {project.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {(project.technologies || []).map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+
+              {projects.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 tracking-wider">NO PROJECTS FOUND</p>
+                  <p className="text-sm text-gray-500 mt-2 tracking-wider">ADD YOUR FIRST PROJECT TO BEGIN</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects.map((project) => (
+                    <div
+                      key={project.id}
+                      className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden group"
                     >
-                      {tech}
-                    </span>
+                      <div className="relative h-48">
+                        {project.image ? (
+                          <Image
+                            src={project.image}
+                            alt={project.title}
+                            width={400}
+                            height={192}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/project-placeholder.svg';
+                            }}
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                            <span className="text-gray-500 text-sm">No Image</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-xl tracking-wider uppercase font-light text-white mb-2">
+                          {project.title}
+                        </h3>
+                        <p className="text-gray-400 tracking-wider mb-4">
+                          {project.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {(project.technologies || []).map((tech) => (
+                            <span
+                              key={tech}
+                              className="px-3 py-1 text-sm bg-gray-800 text-gray-400 rounded-full hover:bg-gray-700 hover:text-white transition-colors"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => handleEditProject(project)}
+                            className="text-gray-400 hover:text-white transition-colors tracking-wider"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProject(project.id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors tracking-wider"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => handleEditProject(project)}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProject(project.id)}
-                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
+
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6 overflow-y-auto max-h-[90vh]">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {editingProject ? 'Edit Project' : 'Add New Project'}
-            </h2>
-            {error && <p className="text-red-500 mb-4">Error: {error}</p>}
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-black border border-gray-800 max-w-2xl w-full p-8">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl tracking-wider uppercase font-light text-white">
+                {editingProject ? 'Edit Project' : 'New Project'}
+              </h2>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setError(null);
+                }}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {error && (
+              <div className="border border-gray-800 px-6 py-4 text-white mb-6" role="alert">
+                <span className="tracking-wider text-xs">ERROR</span>
+                <span className="block mt-2 text-gray-400"> {error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   Title
                 </label>
                 <input
                   type="text"
                   value={formData.title || ''}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   Description
                 </label>
                 <textarea
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   Image URL
                 </label>
                 <input
                   type="url"
                   value={formData.image || ''}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                   placeholder="https://example.com/image.png"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   Technologies (comma-separated)
                 </label>
                 <input
                   type="text"
-                  // Use formData.technologies directly, handle array/string in value
                   value={Array.isArray(formData.technologies) ? formData.technologies.join(', ') : formData.technologies}
-                  // Update state, keeping it as string temporarily
                   onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   GitHub URL
                 </label>
                 <input
                   type="url"
                   value={formData.githubUrl || ''}
                   onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-xs tracking-widest text-gray-400 mb-2 uppercase">
                   Live URL (optional)
                 </label>
                 <input
                   type="url"
                   value={formData.liveUrl || ''}
                   onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
                 />
               </div>
               
-              <div className="flex justify-end gap-4 mt-6">
+              <div className="flex justify-end gap-4 mt-8">
                 <button
                   type="button"
                   onClick={() => {
                     setIsModalOpen(false);
-                    setError(null); // Clear error when closing modal
+                    setError(null);
                   }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  className="px-4 py-2 text-gray-400 hover:text-white text-xs tracking-widest"
                 >
-                  Cancel
+                  CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 border border-white text-white hover:bg-white/10 text-xs tracking-widest transition-colors"
                 >
-                  {editingProject ? 'Save Changes' : 'Add Project'}
+                  {editingProject ? 'SAVE CHANGES' : 'ADD PROJECT'}
                 </button>
               </div>
             </form>

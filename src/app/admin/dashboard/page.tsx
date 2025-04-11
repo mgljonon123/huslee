@@ -1,154 +1,324 @@
 'use client';
 
-export default function DashboardPage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-        Dashboard Overview
-      </h1>
+import { motion } from 'framer-motion';
+import { 
+  Star, 
+  Moon, 
+  Sun, 
+  Briefcase, 
+  Code, 
+  MessageSquare, 
+  Eye, 
+  Plus, 
+  CheckCircle, 
+  ArrowRight,
+  Github,
+  ExternalLink
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    Total Projects
-                  </dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">
-                    12
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string | null;
+  technologies: string[];
+  githubUrl: string;
+  liveUrl?: string | null;
+  featured?: boolean;
+  order?: number;
+}
+
+export default function DashboardPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/projects', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="space-y-8"
+    >
+      <motion.div variants={itemVariants} className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-300 mt-1">Welcome to your cosmic control center</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    Total Skills
-                  </dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">
-                    8
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 rounded-full bg-white animate-pulse"></div>
+          <span className="text-sm text-gray-300">Live</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    New Messages
-                  </dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">
-                    3
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    Profile Views
-                  </dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">
-                    1,234
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Recent Activity
-        </h2>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div 
+          className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-white/20 transition-all duration-300"
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+        >
           <div className="p-6">
-            <div className="flow-root">
-              <ul className="-mb-8">
-                <li className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
-                        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          New project <span className="font-medium text-gray-900 dark:text-white">E-Commerce Platform</span> added
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                        <time dateTime="2024-03-26">1 hour ago</time>
-                      </div>
-                    </div>
+            <div className="flex items-center justify-between">
+              <div className="p-3 bg-gray-800/50 rounded-lg">
+                <Briefcase className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <Star className="h-4 w-4 text-white" />
+                <span className="text-sm text-gray-300">0</span>
+              </div>
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-white">Projects</h3>
+            <p className="mt-1 text-sm text-gray-400">Total active projects</p>
+          </div>
+          <div className="h-1 w-full bg-gradient-to-r from-gray-700 to-gray-500"></div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-white/20 transition-all duration-300"
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="p-3 bg-gray-800/50 rounded-lg">
+                <Code className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <Star className="h-4 w-4 text-white" />
+                <span className="text-sm text-gray-300">0</span>
+              </div>
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-white">Skills</h3>
+            <p className="mt-1 text-sm text-gray-400">Technical abilities</p>
+          </div>
+          <div className="h-1 w-full bg-gradient-to-r from-gray-700 to-gray-500"></div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-white/20 transition-all duration-300"
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="p-3 bg-gray-800/50 rounded-lg">
+                <MessageSquare className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <Star className="h-4 w-4 text-white" />
+                <span className="text-sm text-gray-300">3</span>
+              </div>
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-white">Messages</h3>
+            <p className="mt-1 text-sm text-gray-400">Unread messages</p>
+          </div>
+          <div className="h-1 w-full bg-gradient-to-r from-gray-700 to-gray-500"></div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-white/20 transition-all duration-300"
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="p-3 bg-gray-800/50 rounded-lg">
+                <Eye className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <Star className="h-4 w-4 text-white" />
+                <span className="text-sm text-gray-300">0</span>
+              </div>
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-white">Profile Views</h3>
+            <p className="mt-1 text-sm text-gray-400">Total visitors</p>
+          </div>
+          <div className="h-1 w-full bg-gradient-to-r from-gray-700 to-gray-500"></div>
+        </motion.div>
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div 
+          className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg"
+          whileHover={{ boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-white">Recent Activity</h2>
+              <div className="flex items-center space-x-1 text-white text-sm">
+                <span>View All</span>
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gray-800/50 flex items-center justify-center">
+                    <Plus className="h-5 w-5 text-white" />
                   </div>
-                </li>
-                <li className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
-                        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Updated <span className="font-medium text-gray-900 dark:text-white">About Me</span> section
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                        <time dateTime="2024-03-25">2 hours ago</time>
-                      </div>
-                    </div>
+                </div>
+                <div className="ml-4 flex-1">
+                  <p className="text-sm text-white">
+                    New project <span className="font-medium text-white">E-Commerce Platform</span> added
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gray-800/50 flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-white" />
                   </div>
-                </li>
-              </ul>
+                </div>
+                <div className="ml-4 flex-1">
+                  <p className="text-sm text-white">
+                    Updated <span className="font-medium text-white">About Me</span> section
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+
+        <motion.div variants={itemVariants} className="mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">
+              Featured Projects
+            </h2>
+            <Link href="/admin/projects" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
+              <span>View All</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.slice(0, 3).map((project) => (
+                <motion.div
+                  key={project.id}
+                  variants={itemVariants}
+                  className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-white/20 transition-all duration-300"
+                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(255, 255, 255, 0.3)" }}
+                >
+                  <div className="relative h-48">
+                    {project.image ? (
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        width={400}
+                        height={192}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                        <span className="text-gray-500 text-sm">No Image</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
+                    <p className="text-gray-400 mb-4 line-clamp-2">{project.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-1 text-xs bg-gray-800/50 text-white rounded-full"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex space-x-4">
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            <Github className="h-5 w-5" />
+                          </a>
+                        )}
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            <ExternalLink className="h-5 w-5" />
+                          </a>
+                        )}
+                      </div>
+                      <Link
+                        href={`/admin/projects/${project.id}`}
+                        className="text-white hover:text-gray-300 transition-colors"
+                      >
+                        Edit
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 } 

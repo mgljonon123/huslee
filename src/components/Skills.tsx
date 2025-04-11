@@ -1,13 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { 
-  Code2, 
-  Database, 
-  Layout, 
-  Server, 
-  Globe,
-} from 'lucide-react';
+import { Code2, Database, Layout, Server, Globe } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Skill {
   id: string;
@@ -37,6 +32,34 @@ const groupSkillsByCategory = (skills: Skill[]) => {
   }, {} as { [key: string]: Skill[] });
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { 
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" }
+  }
+};
+
+const progressVariants = {
+  hidden: { width: 0 },
+  visible: (custom: number) => ({
+    width: `${Math.min(Math.max(custom, 0), 5) * 20}%`,
+    transition: { duration: 0.8, ease: "easeOut" }
+  })
+};
+
 export default function Skills() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,14 +69,11 @@ export default function Skills() {
     const fetchSkills = async () => {
       try {
         const response = await fetch('/api/skills');
-        
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to fetch skills');
         }
-        
         const data = await response.json();
-        // Sort skills by order
         const sortedSkills = data.sort((a: Skill, b: Skill) => a.order - b.order);
         setSkills(sortedSkills);
       } catch (err) {
@@ -70,75 +90,110 @@ export default function Skills() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="h-12 w-12 border-t-2 border-b-2 border-gray-400 rounded-full"
+        />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-600 dark:text-red-400 py-8">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center text-red-500 py-8"
+      >
         {error}
-      </div>
+      </motion.div>
     );
   }
 
   const groupedSkills = groupSkillsByCategory(skills);
   const categories = Object.keys(groupedSkills).sort();
-  const levelToPercentage = (level: number) => {
-    return Math.min(Math.max(level, 0), 5) * 20;
-  };
 
   const getIconComponent = (iconName: string) => {
     const IconComponent = iconComponents[iconName.toLowerCase() as keyof typeof iconComponents] || Code2;
-    return <IconComponent className="w-5 h-5 text-primary" />;
+    return <IconComponent className="w-6 h-6 text-gray-400" />;
+  };
+
+  const getProgressColor = (level: number) => {
+    const percentage = Math.min(Math.max(level, 0), 5) * 20;
+    if (percentage <= 40) return 'from-red-500 to-red-300';
+    if (percentage <= 70) return 'from-yellow-500 to-yellow-300';
+    return 'from-green-500 to-green-300';
   };
 
   return (
-    <>
-      <div className="text-center mb-12 md:mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
-          Technical Skillset
-        </h2>
-        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          A breakdown of my proficiency across different technologies.
-        </p>
-      </div>
+    <section className="bg-black text-white py-20">
+      <motion.div 
+        className="max-w-5xl mx-auto px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.2 }}
+        variants={containerVariants}
+      >
+        <motion.div className="text-center mb-16" variants={itemVariants}>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            Technical Skillset
+          </h2>
+        </motion.div>
 
-      <div className="space-y-12">
-        {categories.map((category) => (
-          <div key={category}>
-            <h3 className="text-2xl font-semibold capitalize text-gray-800 dark:text-gray-200 mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
-              {category}
-            </h3>
-            <div className="space-y-5">
-              {groupedSkills[category].map((skill) => (
-                <div key={skill.id}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      {getIconComponent(skill.icon)}
-                      <span className="text-md font-medium text-gray-700 dark:text-gray-300">
-                        {skill.name}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-primary/70 to-primary dark:from-primary-dark/70 dark:to-primary-dark h-2.5 rounded-full transition-all duration-500 ease-out"
-                      style={{ width: `${levelToPercentage(skill.level)}%` }} 
-                      role="progressbar"
-                      aria-valuenow={levelToPercentage(skill.level)}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label={`${skill.name} proficiency`} 
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+        <div className="space-y-16">
+          {categories.map((category) => (
+            <motion.div 
+              key={category}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.2 }}
+              variants={containerVariants}
+            >
+              <motion.h3 
+                className="text-2xl font-semibold capitalize mb-6 pb-2 border-b border-gray-800"
+                variants={itemVariants}
+              >
+                {category}
+              </motion.h3>
+              <div className="space-y-6">
+                {groupedSkills[category].map((skill) => {
+                  const percentage = Math.min(Math.max(skill.level, 0), 5) * 20;
+                  return (
+                    <motion.div 
+                      key={skill.id}
+                      variants={itemVariants}
+                      className="group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          {getIconComponent(skill.icon)}
+                          <span className="text-lg font-medium text-white group-hover:text-gray-300 transition-colors">
+                            {skill.name}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-400">
+                          {percentage}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                        <motion.div 
+                          className={`bg-gradient-to-r ${getProgressColor(skill.level)} h-2 rounded-full`}
+                          initial="hidden"
+                          whileInView="visible"
+                          viewport={{ once: false }}
+                          variants={progressVariants}
+                          custom={skill.level}
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </section>
   );
-} 
+}

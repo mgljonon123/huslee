@@ -1,16 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "localhost",
-      "res.cloudinary.com",
-      "images.unsplash.com",
-      "via.placeholder.com",
-    ],
     remotePatterns: [
       {
+        protocol: "http",
+        hostname: "localhost",
+        port: "**", // localhost бол port нь өөр байж болох тул нээж өгөв
+        pathname: "/**",
+      },
+      {
         protocol: "https",
-        hostname: "**",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
+        pathname: "/**",
       },
     ],
   },

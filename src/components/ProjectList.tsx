@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Github, ExternalLink } from 'lucide-react';
 
-// Define Project type directly (should match the one passed from Projects.tsx)
 interface Project {
   id: string;
   title: string;
@@ -16,7 +15,7 @@ interface Project {
   liveUrl?: string | null;
   featured?: boolean;
   order?: number;
-  createdAt?: Date; // Add other fields if needed/passed
+  createdAt?: Date;
   updatedAt?: Date;
 }
 
@@ -27,8 +26,6 @@ interface ProjectListProps {
 const filters = [
   { id: 'all', name: 'All' },
   { id: 'featured', name: 'Featured' },
-  // { id: 'web', name: 'Web Apps' }, 
-  // { id: 'mobile', name: 'Mobile Apps' }, 
 ];
 
 export default function ProjectList({ projects }: ProjectListProps) {
@@ -37,99 +34,112 @@ export default function ProjectList({ projects }: ProjectListProps) {
   const filteredProjects = projects.filter(project => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'featured') return project.featured;
-    return true; 
+    return true;
   });
 
   return (
-    <>
-      <div className="flex flex-wrap justify-center gap-3 mb-10 md:mb-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Filter Buttons */}
+      <div className="flex flex-wrap justify-center gap-6 mb-12">
         {filters.map((filter) => (
           <button
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${ 
-              activeFilter === filter.id
-                ? 'bg-primary text-white border-primary shadow-sm' 
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
-            }`}
+            className={`relative px-8 py-4 rounded-full font-medium text-base transition-all duration-300 ease-in-out
+              ${activeFilter === filter.id
+                ? 'bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg transform scale-105'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-105'
+              }`}
           >
             {filter.name}
+            {activeFilter === filter.id && (
+              <span className="absolute inset-0 rounded-full border border-indigo-300/30 animate-pulse" />
+            )}
           </button>
         ))}
       </div>
-      
+
+      {/* Project Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredProjects.map((project) => (
           <div
             key={project.id}
-            className="group flex flex-col bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+            className="group relative flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
           >
-            <div className="relative h-52 w-full overflow-hidden">
+            {/* Image Section */}
+            <div className="relative h-72 w-full overflow-hidden">
               {project.image ? (
-                <img
+                <Image
                   src={project.image || '/project-placeholder.svg'}
                   alt={project.title}
-                  className="object-cover w-full h-full"
+                  width={500}
+                  height={288}
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.src = '/project-placeholder.svg';
                   }}
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                  <span className="text-gray-500 dark:text-gray-400">No image</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                  <span className="text-gray-400 dark:text-gray-500 font-medium">No Preview</span>
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-            
-            <div className="p-5 flex flex-col flex-grow">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+
+            {/* Content Section */}
+            <div className="p-8 flex flex-col flex-grow">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-indigo-500 transition-colors">
                 {project.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 flex-grow">
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 flex-grow">
                 {project.description}
               </p>
-              
-              <div className="flex flex-wrap gap-2 mb-5">
+
+              {/* Technologies */}
+              <div className="flex flex-wrap gap-3 mb-6">
                 {(project.technologies || []).map((tech: string) => (
                   <span
                     key={tech}
-                    className="px-2.5 py-0.5 text-xs font-medium bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-full"
+                    className="px-3 py-1 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full"
                   >
                     {tech}
                   </span>
                 ))}
               </div>
-              
-              <div className="mt-auto flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700/50">
-                <Link
+
+              {/* Links */}
+              <div className="flex gap-4">
+                <a
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out shadow-sm"
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                  <Github className="w-3.5 h-3.5" />
-                  Code
-                </Link>
+                  <Github className="w-5 h-5" />
+                  <span>GitHub</span>
+                </a>
                 {project.liveUrl && (
-                  <Link
+                  <a
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-dark/90 transition duration-150 ease-in-out shadow-sm"
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   >
-                     <ExternalLink className="w-3.5 h-3.5" />
-                    Live Demo
-                  </Link>
+                    <ExternalLink className="w-5 h-5" />
+                    <span>Live Demo</span>
+                  </a>
                 )}
               </div>
             </div>
           </div>
         ))}
         {filteredProjects.length === 0 && (
-           <p className="col-span-full text-center text-gray-500 dark:text-gray-400">No projects found matching the selected filter.</p>
+          <p className="col-span-full text-center text-gray-500 dark:text-gray-400 py-12">
+            No projects found. Try adjusting your filter!
+          </p>
         )}
       </div>
-    </>
+    </div>
   );
-} 
+}
