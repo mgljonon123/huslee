@@ -5,7 +5,7 @@ interface CachedConnection {
   promise: Promise<typeof mongoose> | null;
 }
 
-let cached: CachedConnection = { conn: null, promise: null };
+const cached: CachedConnection = { conn: null, promise: null };
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env');

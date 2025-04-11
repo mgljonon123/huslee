@@ -57,9 +57,8 @@ export default function LoginPage() {
         setError(data.error || 'И-мэйл эсвэл нууц үг буруу байна');
         setIsLoading(false);
       }
-    } catch (err) {
-      setError('Алдаа гарлаа. Дахин оролдоно уу.');
-      setIsLoading(false);
+    } catch {
+      setError('Failed to login');
     }
   };
 

@@ -3,8 +3,6 @@
 import { motion } from 'framer-motion';
 import { 
   Star, 
-  Moon, 
-  Sun, 
   Briefcase, 
   Code, 
   MessageSquare, 
