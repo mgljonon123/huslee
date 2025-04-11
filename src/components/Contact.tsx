@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Mail, MapPin, Send, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface AboutData {
   email: string;
@@ -112,6 +112,9 @@ export default function Contact() {
         </h2>
         <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Have a question or want to work together? Send me a message!
+        </p>
+        <p className="text-gray-400">
+          I&apos;m always open to discussing new projects, creative ideas or opportunities to be part of your visions.
         </p>
       </div>
       

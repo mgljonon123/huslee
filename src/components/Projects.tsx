@@ -21,7 +21,7 @@ interface Project {
 }
 
 interface ProjectListProps {
-  projects: Project[] | undefined; // undefined байж болно гэдгийг тодорхойлсон
+  projects: Project[] | undefined; // Can be undefined
 }
 
 const filters = [
@@ -61,7 +61,7 @@ const filterVariants = {
 export default function ProjectList({ projects }: ProjectListProps) {
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
-  // projects undefined эсвэл null байвал хоосон массив буцаана
+  // Returns empty array if projects is undefined or null
   const filteredProjects = (projects ?? []).filter((project) => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'featured') return project.featured;
