@@ -23,6 +23,11 @@ const nextConfig = {
         hostname: "via.placeholder.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "th.bing.com",
+        pathname: "/**",
+      },
     ],
   },
   experimental: {

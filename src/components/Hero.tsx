@@ -32,8 +32,8 @@ export default function Hero() {
             </span>
           </h1>
           
-          <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            A passionate full-stack developer crafting beautiful and functional web experiences
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            I&apos;m a passionate developer who loves building beautiful and functional web applications.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">

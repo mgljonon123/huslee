@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Github, ExternalLink } from 'lucide-react';
 
@@ -67,13 +66,14 @@ export default function ProjectList({ projects }: ProjectListProps) {
             className="group relative flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
           >
             {/* Image Section */}
-            <div className="relative h-72 w-full overflow-hidden">
+            <div className="relative h-48 w-full overflow-hidden">
               {project.image ? (
                 <Image
-                  src={project.image || '/project-placeholder.svg'}
+                  src={project.image}
                   alt={project.title}
                   width={500}
-                  height={288}
+                  height={192}
+                  quality={75}
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.src = '/project-placeholder.svg';
