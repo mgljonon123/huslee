@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
@@ -72,7 +72,7 @@ export default function ProjectsPage() {
     return tokenFromDocCookie || null;
   };
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -99,11 +99,11 @@ export default function ProjectsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [fetchProjects]);
 
   const handleAddProject = () => {
     setEditingProject(null);

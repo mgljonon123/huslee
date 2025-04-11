@@ -204,7 +204,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="ml-4 flex-1">
                   <p className="text-sm text-white">
-                    New project <span className="font-medium text-white">E-Commerce Platform</span> added
+                    New project <span className="font-medium text-white">&quot;E-Commerce Platform&quot;</span> added
                   </p>
                   <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
                 </div>

@@ -50,8 +50,8 @@ export default function RegisterPage() {
       } else {
         setError(data.error || 'Бүртгэл амжилтгүй боллоо');
       }
-    } catch (err) {
-      setError('Алдаа гарлаа. Дахин оролдоно уу.');
+    } catch {
+      setError('Failed to register');
     } finally {
       setIsLoading(false);
     }
