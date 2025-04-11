@@ -16,7 +16,7 @@ const ScrollPathFollower = () => {
     const height = window.innerHeight;
 
     // Set initial positions
-    circlesRef.current.forEach((circle, index) => {
+    circlesRef.current.forEach((circle) => {
       if (!circle) return;
       gsap.set(circle, {
         xPercent: -50,

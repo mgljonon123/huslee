@@ -305,7 +305,7 @@ export default function AboutPage() {
                         Profile Information
                       </h2>
                       <p className="text-gray-400 mt-2 text-sm tracking-wider">
-                        Click "Edit About Me" to update your profile information.
+                        Click &quot;Edit About Me&quot; to update your profile information.
                       </p>
                     </div>
                   </div>
