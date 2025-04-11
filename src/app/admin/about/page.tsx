@@ -11,7 +11,7 @@ interface AboutData {
   resumeUrl?: string;
   email: string;
   location?: string;
-  socialLinks?: any;
+  socialLinks: Record<string, string>;
 }
 
 export default function AboutPage() {

@@ -82,11 +82,11 @@ const ScrollPathFollower = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
-      {[0, 1, 2].map((index) => (
+      {[0, 1, 2].map((_index) => (
         <div
-          key={index}
+          key={_index}
           ref={(el) => {
-            circlesRef.current[index] = el;
+            circlesRef.current[_index] = el;
           }}
           className="absolute w-16 h-16 rounded-full"
           style={{
