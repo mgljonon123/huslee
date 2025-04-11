@@ -263,13 +263,13 @@ export default function AboutPage() {
                         try {
                           const socialLinks = e.target.value ? JSON.parse(e.target.value) : null;
                           setFormData({ ...formData, socialLinks });
-                        } catch (err) {
+                        } catch {
                           // Invalid JSON, but we'll let the user continue typing
                         }
                       }}
                       rows={4}
                       className="w-full bg-black border border-gray-800 p-3 text-white focus:border-gray-600 outline-none"
-                      placeholder='{"github": "https://github.com/username", "linkedin": "https://linkedin.com/in/username"}'
+                      placeholder='{&quot;github&quot;: &quot;https://github.com/username&quot;, &quot;linkedin&quot;: &quot;https://linkedin.com/in/username&quot;}'
                     />
                   </div>
 
